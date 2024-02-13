@@ -15,11 +15,11 @@ if lsof -i :3001 >> ~/errors.txt 2>&1; then
  exit 1
 fi
 
-nohup sudo apt install curl -y
+sudo apt install curl -y
 
 #echo "Installing the latest Node.js version..." >> ~/errors.txt
 echo "Installing Dependencies......."
-nohup curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 . ~/.nvm/nvm.sh
 nvm install 20
 nvm use 20
@@ -51,13 +51,13 @@ cd uptime-kuma/
 
 echo "Setting up the app"
 
-nohup npm run setup
+npm run setup
 
 #node server/server.js
 
 echo "Installing PM2"
 
-nohup npm install pm2 -g
+npm install pm2 -g
 
 pm2 start server/server.js --name uptime-kuma
 
