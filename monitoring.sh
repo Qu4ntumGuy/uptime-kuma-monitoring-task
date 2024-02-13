@@ -9,7 +9,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-if nohup lsof -i :3001 >> ~/errors.txt 2>&1; then
+if lsof -i :3001 >> ~/errors.txt 2>&1; then
  echo "Port is already in use."
  echo "Either Uptime-Kuma is running or another website has occupied the port"
  exit 1
@@ -24,8 +24,8 @@ nohup curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh |
 nvm install 20
 nvm use 20
 
-echo "Installing Node"  >> ~/errors.txt
-sudo apt install nodejs
+npm install -g npm
+
 echo "Updating Node to latest" >> ~/errors.txt
 nvm install 20
 nvm use 20
