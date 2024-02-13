@@ -8,6 +8,8 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
+sudo apt install curl
+
 echo "Installing the latest Node.js version..." >> ~/errors.txt
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 . ~/.nvm/nvm.sh
