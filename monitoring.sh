@@ -4,21 +4,29 @@
 
 #sudo apt update
 if [[ $EUID -ne 0 ]]; then
-  echo "This script requires root privileges. Please run as sudo."
+  echo "Permission Denied. Try"
+  echo "sudo bash monitoring.sh"
   exit 1
 fi
 
-sudo apt install curl
+if lsof -i :3001; then
+ echo "Port is already in use."
+ echo "Either Uptime-Kuma is running or another website has occupied the port"
+ exit 1
+fi
 
-echo "Installing the latest Node.js version..." >> ~/errors.txt
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+nohup sudo apt install curl -y
+
+#echo "Installing the latest Node.js version..." >> ~/errors.txt
+echo "Installing Dependencies......."
+nohup curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 . ~/.nvm/nvm.sh
 nvm install 20
 nvm use 20
 
-echo "Installing Node"
+echo "Installing Node"  >> ~/errors.txt
 sudo apt install nodejs
-echo "Updating Node to latest"
+echo "Updating Node to latest" >> ~/errors.txt
 nvm install 20
 nvm use 20
 
