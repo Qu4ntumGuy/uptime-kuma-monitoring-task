@@ -51,17 +51,17 @@ cd uptime-kuma/
 
 echo "Setting up the app"
 
-npm run setup
+nohup npm run setup
 
 #node server/server.js
 
 echo "Installing PM2"
 
-npm install pm2 -g
+nohup npm install pm2 -g
 
 pm2 start server/server.js --name uptime-kuma
 
 pm2 save
-
-echo "-------------------------Script Ended-----------------------------"
+echo "Uptime-Kuma is installed and running on port 3001 (http://localhost:3001)."
+echo "-------------------------Script Ended-----------------------------" >> ~/errors.txt
 
