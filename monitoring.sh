@@ -9,7 +9,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-if lsof -i :3001; then
+if nohup lsof -i :3001; then
  echo "Port is already in use."
  echo "Either Uptime-Kuma is running or another website has occupied the port"
  exit 1
