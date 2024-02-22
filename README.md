@@ -1,2 +1,2 @@
-# Run the bash file by :-
+## Run the bash file by :-
 sudo bash monitoring.sh
