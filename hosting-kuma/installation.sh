@@ -95,6 +95,7 @@ else
     echo "Error: The specified line was not found in the Nginx configuration file." >> ~/errors.txt
 fi
 
-echo "Uptime-Kuma is installed and running on port 3001 (http://localhost:3001)."
+echo "Uptime-Kuma is installed and running.)."
+
 echo "-------------------------Script Ended-----------------------------" >> ~/errors.txt
 
