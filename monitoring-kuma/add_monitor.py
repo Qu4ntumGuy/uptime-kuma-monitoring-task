@@ -20,7 +20,7 @@ sending_url = "http://" + result.stdout
 
 url = os.getenv("UPTIME_URL")
 user_name = os.getenv("USER_NAME")
-user_pass = os.getenv("PASS")
+user_pass = os.getenv("USER_PASS")
 
 with UptimeKumaApi(url) as api:
     api.login(user_name, user_pass)
