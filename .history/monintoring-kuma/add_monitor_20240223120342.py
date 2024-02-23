@@ -6,7 +6,6 @@ import os
 load_dotenv()
 
 command = ['wget', '-qO-', 'https://api64.ipify.org']
-nginxConfigPath = "/etc/nginx/sites-enabled/default"
 
 try:
     result = subprocess.run(
@@ -19,7 +18,7 @@ except subprocess.CalledProcessError as e:
 sending_url = "http://" + result.stdout
 
 with UptimeKumaApi(os.getenv.UPTIME_URL) as api:
-    api.login(os.getenv.USER, os.getenv.PASS)
+    api.login('admin', 'root@123')
     api.add_monitor(
         type=MonitorType.HTTP,
         name="Client-sever",

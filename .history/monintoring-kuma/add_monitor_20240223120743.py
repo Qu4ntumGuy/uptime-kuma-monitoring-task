@@ -6,7 +6,6 @@ import os
 load_dotenv()
 
 command = ['wget', '-qO-', 'https://api64.ipify.org']
-nginxConfigPath = "/etc/nginx/sites-enabled/default"
 
 try:
     result = subprocess.run(

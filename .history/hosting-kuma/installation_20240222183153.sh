@@ -83,7 +83,6 @@ pm2 start server/server.js --name uptime-kuma
 pm2 save
 
 echo "Setting up Server" >> ~/errors.txt
-
 file_path="/etc/nginx/sites-enabled/default"
 add_line="proxy_pass http://localhost:3001;"
 find_line='try_files $uri $uri/ =404;'
