@@ -34,6 +34,15 @@ def extract_domain_name_nginx(config_content):
     return None
 
 
+# def extract_domain_name_nginx(config_content):
+#     for line in config_content.split('\n'):
+#         match = re.search(r'\bserver_name\s+([^;]+)\s*;', line)
+#         if match:
+#             extracted_content = match.group(1)
+#             return extracted_content
+#     return None
+
+
 def log_error(message):
     # Log errors to a file with a timestamp
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
