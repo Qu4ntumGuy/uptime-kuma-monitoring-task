@@ -24,23 +24,23 @@ def extract_domain_name_apache(config_content):
     return None
 
 
-def extract_domain_name_nginx(config_content):
-    for line in config_content.split('\n'):
-        # Use a regular expression to match anything after "listen 80"
-        match = re.search(r'\blisten\s+80\s+([^;]+)\s*;', line)
-        if match:
-            extracted_content = match.group(1)
-            return extracted_content
-    return None
-
-
 # def extract_domain_name_nginx(config_content):
 #     for line in config_content.split('\n'):
-#         match = re.search(r'\bserver_name\s+([^;]+)\s*;', line)
+#         # Use a regular expression to match anything after "listen 80"
+#         match = re.search(r'\blisten\s+80\s+([^;]+)\s*;', line)
 #         if match:
 #             extracted_content = match.group(1)
 #             return extracted_content
 #     return None
+
+
+def extract_domain_name_nginx(config_content):
+    for line in config_content.split('\n'):
+        match = re.search(r'\bserver_name\s+([^;]+)\s*;', line)
+        if match:
+            extracted_content = match.group(1)
+            return extracted_content
+    return None
 
 
 def log_error(message):
