@@ -119,7 +119,7 @@ def main():
         api.login(user_name, user_pass)
         api.add_monitor(
             type=MonitorType.HTTP,
-            name="MERN Crud app",
+            name="Web app",
             url=sending_url,
         )
 
