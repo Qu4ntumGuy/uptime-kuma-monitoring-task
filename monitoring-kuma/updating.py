@@ -118,26 +118,35 @@ def main():
 
     with UptimeKumaApi(url) as api:
         api.login(user_name, user_pass)
-        api.add_monitor(
-            type=MonitorType.HTTP,
-            name=monitor,
-            url=sending_url,
-        )
+        data_response = api.get_monitors()
+
+    names_array = [item['name'] for item in data_response]
+
+    contains_client = any(monitor in name.lower() for name in names_array)
+
+    # Find id for the given name
+    client_id = None
+
+    for item in data_response:
+        if item['name'] == monitor:
+            client_id = item['id']
+            break
+
+    if contains_client:
+        with UptimeKumaApi(url) as api:
+            api.login(user_name, user_pass)
+            api.edit_monitor(client_id,
+                             url=sending_url,
+                             )
+    else:
+        with UptimeKumaApi(url) as api:
+            api.login(user_name, user_pass)
+            api.add_monitor(
+                type=MonitorType.HTTP,
+                name=monitor,
+                url=sending_url,
+            )
 
 
 if __name__ == "__main__":
     main()
-
-
-# command = ['wget', '-qO-', 'https://api64.ipify.org']
-# nginxConfigPath = "/etc/nginx/sites-enabled/default"
-
-# try:
-#     result = subprocess.run(
-#         command, capture_output=True, text=True, check=True)
-#     # print(result.stdout)
-# except subprocess.CalledProcessError as e:
-#     print(f"Error: {e}")
-#     print(f"Output: {e.output}")
-
-# sending_url = "http://" + result.stdout
