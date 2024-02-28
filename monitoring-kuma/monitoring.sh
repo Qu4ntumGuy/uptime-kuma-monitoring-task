@@ -7,4 +7,4 @@ sudo apt install python3-pip -y
 pip install uptime-kuma-api
 pip install python-dotenv
 
-python3 add_monitor.py
+python3 updating.py
