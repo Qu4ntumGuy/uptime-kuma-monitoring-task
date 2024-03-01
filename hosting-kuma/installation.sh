@@ -47,6 +47,26 @@ npm_version=$(npm -v)
 
 echo "Node.js version: $node_version"
 echo "npm version: $npm_version"
+# Install or update MySQL
+echo "Installing or updating MySQL..." >> ~/errors.txt
+sudo apt install mysql-server -y
+
+# Change MySQL bind IP to 0.0.0.0
+echo "Changing MySQL bind IP to 0.0.0.0..." >> ~/errors.txt
+sudo sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/g' /etc/mysql/mysql.conf.d/mysqld.cnf
+sudo systemctl restart mysql
+
+# Create database
+sudo mysql -e "CREATE DATABASE kuma;"
+
+# Create websites table in kuma database
+echo "Creating websites table..." >> ~/errors.txt
+sudo mysql -e "USE kuma; CREATE TABLE websites (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) UNIQUE, url VARCHAR(255), status VARCHAR(255));"
+echo "Creating admin user..." >> ~/errors.txt
+sudo mysql -e "CREATE USER 'admin'@'%' IDENTIFIED BY 'root@123';"
+sudo mysql -e "GRANT SELECT, INSERT, UPDATE ON kuma.websites TO 'admin'@'%';"
+sudo mysql -e "FLUSH PRIVILEGES;"
+
 echo ""
 echo "----------------Installing Monitoring Tool UPTIME-KUMA----------------"
 echo ""
@@ -95,4 +115,3 @@ fi
 echo "Uptime-Kuma is installed and running.)."
 
 echo "-------------------------Script Ended-----------------------------" >> ~/errors.txt
-
