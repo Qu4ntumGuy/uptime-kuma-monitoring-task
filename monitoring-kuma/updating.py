@@ -55,6 +55,18 @@ def get_enabled_sites(directory):
     return os.listdir(directory)
 
 
+def get_public_ip():
+    try:
+        # Use curl to fetch public IP from an external service
+        result = subprocess.run(['curl', 'ifconfig.me'],
+                                capture_output=True, text=True, check=True)
+        public_ip = result.stdout.strip()
+        return public_ip
+    except subprocess.CalledProcessError as e:
+        print(f"Error fetching public IP: {e}")
+        return None
+
+
 def check_process_at_port(port):
     try:
         process = subprocess.run(

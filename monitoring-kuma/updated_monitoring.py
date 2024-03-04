@@ -1,31 +1,11 @@
 import subprocess
-import mysql.connector
 import os
 import re
 from uptime_kuma_api import UptimeKumaApi, MonitorType
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import datetime
 
-load_dotenv()
-
-url = os.getenv("UPTIME_URL")
-user_name = os.getenv("USER_NAME")
-user_pass = os.getenv("USER_PASS")
-monitor = os.getenv("MONITOR_NAME")
-
-# Replace these with your actual database connection details
-db_config = {
-    'host': '3.149.245.49',
-    'user': 'admin',
-    'password': 'root@123',
-    'database': 'kuma',
-}
-
-# Create a connection to the MySQL server
-connection = mysql.connector.connect(**db_config)
-
-name = []
-url = []
+# load_dotenv()
 
 
 def extract_domain_name_apache(config_content):
@@ -38,6 +18,16 @@ def extract_domain_name_apache(config_content):
             if server_name_match:
                 return server_name_match.group(1)
     return None
+
+
+# def extract_domain_name_nginx(config_content):
+#     for line in config_content.split('\n'):
+#         # Use a regular expression to match anything after "listen 80"
+#         match = re.search(r'\blisten\s+80\s+([^;]+)\s*;', line)
+#         if match:
+#             extracted_content = match.group(1)
+#             return extracted_content
+#     return None
 
 
 def extract_domain_name_nginx(config_content):
@@ -74,6 +64,7 @@ def check_process_at_port(port):
 def check_web_servers(port, protocol):
     url = None
     process_output = check_process_at_port(port)
+    print(process_output)
 
     if "nginx" in process_output:
         print(f"Nginx process found at port {port}")
@@ -117,68 +108,41 @@ def check_web_servers(port, protocol):
 
 def main():
     sending_url = check_web_servers(80, 'http')
-    print(sending_url)
     if sending_url is None:
         sending_url = check_web_servers(443, 'https')
 
-    with UptimeKumaApi(url) as api:
-        api.login(user_name, user_pass)
-        data_response = api.get_monitors()
+    print(sending_url)
+    # with UptimeKumaApi(url) as api:
+    #     api.login(user_name, user_pass)
+    #     data_response = api.get_monitors()
 
-    names_array = [item['name'] for item in data_response]
+    # names_array = [item['name'] for item in data_response]
 
-    contains_client = any(monitor in name.lower() for name in names_array)
+    # contains_client = any(monitor in name.lower() for name in names_array)
 
-    # Find id for the given name
-    client_id = None
+    # # Find id for the given name
+    # client_id = None
 
-    for item in data_response:
-        if item['name'] == monitor:
-            client_id = item['id']
-            break
+    # for item in data_response:
+    #     if item['name'] == monitor:
+    #         client_id = item['id']
+    #         break
 
-    if contains_client:
-        with UptimeKumaApi(url) as api:
-            api.login(user_name, user_pass)
-            api.edit_monitor(client_id,
-                             url=sending_url,
-                             )
-    else:
-        with UptimeKumaApi(url) as api:
-            api.login(user_name, user_pass)
-            api.add_monitor(
-                type=MonitorType.HTTP,
-                name=monitor,
-                url=sending_url,
-            )
+    # if contains_client:
+    #     with UptimeKumaApi(url) as api:
+    #         api.login(user_name, user_pass)
+    #         api.edit_monitor(client_id,
+    #                          url=sending_url,
+    #                          )
+    # else:
+    #     with UptimeKumaApi(url) as api:
+    #         api.login(user_name, user_pass)
+    #         api.add_monitor(
+    #             type=MonitorType.HTTP,
+    #             name=monitor,
+    #             url=sending_url,
+    #         )
 
 
 if __name__ == "__main__":
     main()
-
-
-try:
-    # Create a cursor to interact with the database
-    cursor = connection.cursor()
-    # Execute a query to select all data from the credentials table
-    query = "SELECT * FROM websites"
-    cursor.execute(query)
-    update_query = "UPDATE websites SET name = {updated_name}, url = {updated_url} WHERE ip = {public_ip}"
-    insert_query = "INSERT INTO websites VALUES ({public_ip}, {updated_name}, {updated_url})"
-    # Fetch all rows
-    rows = cursor.fetchall()
-
-    # Print the data
-    for row in rows:
-        client_ip.append(row[1])
-        name.append(row[2])
-        url.append(row[3])
-
-finally:
-    # Close the cursor and connection
-    cursor.close()
-    connection.close()
-
-# print("IP Array:", client_ip)
-# print("Name Array:", name)
-# print("URL Array:", url)
