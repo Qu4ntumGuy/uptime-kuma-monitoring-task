@@ -3,6 +3,14 @@ import os
 import configparser
 import re
 import mysql.connector
+from uptime_kuma_api import UptimeKumaApi, MonitorType
+from dotenv import load_dotenv
+import datetime
+
+client = os.popen('curl ifconfig.me').read().strip()
+
+# api = UptimeKumaApi(os.getenv("UPTIME_KUMA_API_KEY"))
+api = UptimeKumaApi("uk1_lobjtoOrDAtp4cywfqU_CyzTkVcEUefSdr2vqDgD")
 
 
 def get_running_web_servers():
@@ -59,32 +67,67 @@ def extract_ssl_info_nginx(config_content):
     return False
 
 
-def list_enabled_sites_nginx():
-    enabled_sites = []
-    config_directory = '/etc/nginx/sites-enabled/'
+# def list_enabled_sites_nginx():
+#     enabled_sites = []
+#     config_directory = '/etc/nginx/sites-enabled/'
+
+#     for filename in os.listdir(config_directory):
+#         if not filename.endswith(".conf"):
+#             enabled_sites.append(filename)
+
+#     return enabled_sites
+
+
+# def list_enabled_sites_apache():
+#     enabled_sites = []
+#     config_directory = '/etc/apache2/sites-enabled/'
+
+#     for filename in os.listdir(config_directory):
+#         if filename.endswith(".conf"):
+#             enabled_sites.append(filename)
+
+#     return enabled_sites
+
+
+def site_status_nginx(site_name):
+    nginx_sites_enabled_path = '/etc/nginx/sites-enabled/'
+    # Check if the specified site name is present in the sites-enabled directory
+    site_enabled_path = os.path.join(nginx_sites_enabled_path, site_name)
+    return os.path.islink(site_enabled_path) and os.path.exists(site_enabled_path)
+
+
+def site_status_apache(site_name):
+    nginx_sites_enabled_path = '/etc/apache2/sites-enabled/'
+    # Check if the specified site name is present in the sites-enabled directory
+    site_enabled_path = os.path.join(nginx_sites_enabled_path, site_name)
+    return os.path.islink(site_enabled_path) and os.path.exists(site_enabled_path)
+
+
+def list_avail_sites_nginx():
+    avail_sites = []
+    config_directory = '/etc/nginx/sites-available/'
 
     for filename in os.listdir(config_directory):
-        if not filename.endswith(".conf"):
-            enabled_sites.append(filename)
+        avail_sites.append(filename)
 
-    return enabled_sites
+    return avail_sites
 
 
-def list_enabled_sites_apache():
-    enabled_sites = []
-    config_directory = '/etc/apache2/sites-enabled/'
+def list_avail_sites_apache():
+    avail_sites = []
+    config_directory = '/etc/apache2/sites-available/'
 
     for filename in os.listdir(config_directory):
         if filename.endswith(".conf"):
-            enabled_sites.append(filename)
+            avail_sites.append(filename)
 
-    return enabled_sites
+    return avail_sites
 
 
-def insert_into_database(server_type, site_name, domain, url, ssl_enabled):
+def insert_into_database(server_type, site_name, url, client, status):
     try:
         connection = mysql.connector.connect(
-            host="localhost",
+            host="3.91.229.220",
             user="admin",
             password="root@123",
             database="kuma"
@@ -92,9 +135,9 @@ def insert_into_database(server_type, site_name, domain, url, ssl_enabled):
         cursor = connection.cursor()
 
         # Insert the information into the websites table
-        insert_query = "INSERT INTO websites (name, url, status) VALUES (%s, %s, %s)"
+        insert_query = "INSERT INTO websites (name, url, client, status) VALUES (%s, %s, %s, %s)"
         # You might need to adjust the status based on your use case
-        values = (site_name, url, "Running")
+        values = (site_name, url, client, status)
         cursor.execute(insert_query, values)
 
         connection.commit()
@@ -116,21 +159,29 @@ def main():
     if running_servers:
         for server_type in set(running_servers):
             if server_type == 'nginx':
-                enabled_sites = list_enabled_sites_nginx()
+                site_status = site_status_nginx
+                avail_sites = list_avail_sites_nginx
                 extract_domain_func = extract_domain_name_nginx
                 extract_ssl_info_func = extract_ssl_info_nginx
             elif server_type == 'apache2':
-                enabled_sites = list_enabled_sites_apache()
+                site_status = site_status_apache
+                avail_sites = list_avail_sites_apache
                 extract_domain_func = extract_domain_name_apache
                 extract_ssl_info_func = extract_ssl_info_apache
             else:
                 print(f"Unsupported server type: {server_type}")
                 continue
 
-            if enabled_sites:
-                for site in enabled_sites:
+            if avail_sites:
+                for site in avail_sites:
                     config_file = os.path.join(
-                        '/etc', server_type, 'sites-enabled', site)
+                        '/etc', server_type, 'sites-available', site)
+
+                    status = None
+                    if site_status(site):
+                        status = "UP"
+                    else:
+                        status = "DOWN"
 
                     try:
                         with open(config_file, 'r') as f:
@@ -147,16 +198,15 @@ def main():
                             site_name = os.path.splitext(site)[0]
 
                             # Insert into the database
-                            insert_into_database(
-                                server_type, site_name, domain, url, ssl_enabled)
+                            # insert_into_database(server_type, site_name, url, client, status)
 
                             # Print the information
-                            print(f"{url} - {site_name}")
+                            print(f"{url} - {site_name} - {client} - {status}")
 
                     except FileNotFoundError:
                         pass
             else:
-                print(f"No enabled sites found for {
+                print(f"No available sites found for {
                       server_type.capitalize()}.")
     else:
         print("Neither Apache nor Nginx is running.")

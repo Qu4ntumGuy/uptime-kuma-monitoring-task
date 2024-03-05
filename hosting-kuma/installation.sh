@@ -61,11 +61,12 @@ sudo mysql -e "CREATE DATABASE kuma;"
 
 # Create websites table in kuma database
 echo "Creating websites table..." >> ~/errors.txt
-sudo mysql -e "USE kuma; CREATE TABLE websites (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) UNIQUE, url VARCHAR(255), status VARCHAR(255));"
+sudo mysql -e "USE kuma; CREATE TABLE websites (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255) UNIQUE, url VARCHAR(255), client VARCHAR(255), status VARCHAR(255));"
 echo "Creating admin user..." >> ~/errors.txt
 sudo mysql -e "CREATE USER 'admin'@'%' IDENTIFIED BY 'root@123';"
 sudo mysql -e "GRANT SELECT, INSERT, UPDATE ON kuma.websites TO 'admin'@'%';"
 sudo mysql -e "FLUSH PRIVILEGES;"
+sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native password BY 'root@123';"
 
 echo ""
 echo "----------------Installing Monitoring Tool UPTIME-KUMA----------------"
