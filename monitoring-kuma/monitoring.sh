@@ -6,4 +6,5 @@ pip install mysql-connector-python
 pip install uptime-kuma-api
 pip install python-dotenv
 pip install psutil
+
 python3 updating.py
