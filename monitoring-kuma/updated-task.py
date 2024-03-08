@@ -7,10 +7,11 @@ from uptime_kuma_api import UptimeKumaApi, MonitorType
 from dotenv import load_dotenv
 import datetime
 
-client = os.popen('curl ifconfig.me').read().strip()
+client = os.popen('wget -qO- ifconfig.me').read().strip()
 
-# api = UptimeKumaApi(os.getenv("UPTIME_KUMA_API_KEY"))
-api = UptimeKumaApi("uk1_lobjtoOrDAtp4cywfqU_CyzTkVcEUefSdr2vqDgD")
+# api = UptimeKumaApi("uk1_lobjtoOrDAtp4cywfqU_CyzTkVcEUefSdr2vqDgD")
+api = UptimeKumaApi("http://3.91.229.220/")
+api.login("admin", "root@123")
 
 
 def get_running_web_servers():
@@ -67,28 +68,6 @@ def extract_ssl_info_nginx(config_content):
     return False
 
 
-# def list_enabled_sites_nginx():
-#     enabled_sites = []
-#     config_directory = '/etc/nginx/sites-enabled/'
-
-#     for filename in os.listdir(config_directory):
-#         if not filename.endswith(".conf"):
-#             enabled_sites.append(filename)
-
-#     return enabled_sites
-
-
-# def list_enabled_sites_apache():
-#     enabled_sites = []
-#     config_directory = '/etc/apache2/sites-enabled/'
-
-#     for filename in os.listdir(config_directory):
-#         if filename.endswith(".conf"):
-#             enabled_sites.append(filename)
-
-#     return enabled_sites
-
-
 def site_status_nginx(site_name):
     nginx_sites_enabled_path = '/etc/nginx/sites-enabled/'
     # Check if the specified site name is present in the sites-enabled directory
@@ -134,15 +113,51 @@ def insert_into_database(server_type, site_name, url, client, status):
         )
         cursor = connection.cursor()
 
-        # Insert the information into the websites table
-        insert_query = "INSERT INTO websites (name, url, client, status) VALUES (%s, %s, %s, %s)"
-        # You might need to adjust the status based on your use case
-        values = (site_name, url, client, status)
-        cursor.execute(insert_query, values)
+        fetched_name = "SELECT name FROM websites WHERE client = %s"
+        fetching_value = client
+        cursor.execute(fetched_name, fetching_value)
+        fetched_data = cursor.fetchall()
 
-        connection.commit()
-        print(f"Information inserted into the database for {
-              server_type} - {site_name}")
+        for data in fetched_data:
+            if data[0] == site_name:
+                # If the site_name is found, construct and execute the DELETE query
+                delete_query = "DELETE FROM websites WHERE name = %s"
+                value = (site_name,)
+                cursor.execute(delete_query, value)
+                connection.commit()
+                print(f"Information deleted from the database for {
+                      server_type} - {site_name}")
+                break  # Exit the loop after deleting the entry for the specified site
+            else:
+                pass
+        # for data in fetched_data:
+        #     if data != site_name:
+        #         delete_query = "DELETE FROM websites WHERE name = %s"
+        #         value = (site_name,)
+        #         cursor.execute(delete_query, value)
+        #         connection.commit()
+        #         print(f"Information deleted from the database for {server_type} - {site_name}")
+        #     else:
+        #         pass
+
+        for data in fetched_data:
+            if site_name in data:
+                update_query = "UPDATE websites SET url = %s, status = %s WHERE name = %s"
+                values = (url, status, site_name)
+                cursor.execute(update_query, values)
+                connection.commit()
+                print(f"Information updated in the database for {
+                      server_type} - {site_name}")
+
+            else:
+                insert_query = "INSERT INTO websites (name, url, client, status) VALUES (%s, %s, %s, %s)"
+                values = (site_name, url, client, status)
+                cursor.execute(insert_query, values)
+                connection.commit()
+                print(f"Information inserted into the database for {
+                      server_type} - {site_name}")
+
+        # print(fetched_data)
 
     except mysql.connector.Error as e:
         print(f"Error inserting into the database: {e}")
@@ -160,12 +175,12 @@ def main():
         for server_type in set(running_servers):
             if server_type == 'nginx':
                 site_status = site_status_nginx
-                avail_sites = list_avail_sites_nginx
+                avail_sites = list_avail_sites_nginx()
                 extract_domain_func = extract_domain_name_nginx
                 extract_ssl_info_func = extract_ssl_info_nginx
             elif server_type == 'apache2':
                 site_status = site_status_apache
-                avail_sites = list_avail_sites_apache
+                avail_sites = list_avail_sites_apache()
                 extract_domain_func = extract_domain_name_apache
                 extract_ssl_info_func = extract_ssl_info_apache
             else:
@@ -197,8 +212,10 @@ def main():
                             url = f"{protocol}://{domain}"
                             site_name = os.path.splitext(site)[0]
 
+                            print(type(client))
                             # Insert into the database
-                            # insert_into_database(server_type, site_name, url, client, status)
+                            insert_into_database(
+                                server_type, site_name, url, client, status)
 
                             # Print the information
                             print(f"{url} - {site_name} - {client} - {status}")
