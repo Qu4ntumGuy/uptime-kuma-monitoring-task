@@ -9,7 +9,7 @@ import datetime
 
 client = os.popen('wget -qO- ifconfig.me').read().strip()
 
-api = UptimeKumaApi("http://54.80.131.203")
+api = UptimeKumaApi("http://18.232.57.26")
 api.login('admin', 'root@123')
 
 
@@ -105,7 +105,7 @@ def list_avail_sites_apache():
 def fetched_names_list():
     try:
         connection = mysql.connector.connect(
-            host="54.80.131.203",
+            host="18.232.57.26",
             user="admin",
             password="root@123",
             database="kuma"
@@ -131,7 +131,7 @@ def fetched_names_list():
 def insert_into_database(server_type, site_name, url, client, status):
     try:
         connection = mysql.connector.connect(
-            host="54.80.131.203",
+            host="18.232.57.26",
             user="admin",
             password="root@123",
             database="kuma"
@@ -194,7 +194,7 @@ def insert_into_database(server_type, site_name, url, client, status):
 def main():
     try:
         connection = mysql.connector.connect(
-            host="54.80.131.203",
+            host="18.232.57.26",
             user="admin",
             password="root@123",
             database="kuma"
