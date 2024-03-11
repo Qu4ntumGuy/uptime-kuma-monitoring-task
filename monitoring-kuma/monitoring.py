@@ -200,8 +200,7 @@ def main():
                     continue
                 if avail_sites:
                     for site in avail_sites:
-                        config_file = os.path.join(
-                            '/etc', server_type, 'sites-available', site)
+                        config_file = os.path.join('/etc', server_type, 'sites-available', site)
                         status = None
                         if site_status(site):
                             status = "UP"
@@ -220,11 +219,9 @@ def main():
                                 url = f"{protocol}://{domain}"
                                 site_name = os.path.splitext(site)[0]
                                 available_names.append(site_name)
-                                insert_into_database(
-                                    server_type, site_name, url, client, status)
+                                insert_into_database(server_type, site_name, url, client, status)
                                 # Print the information
-                                print(
-                                    f"{url} - {site_name} - {site} - {client} - {status}")
+                                print(f"{url} - {site_name} - {site} - {client} - {status}")
                         except FileNotFoundError:
                             pass
                 else:
