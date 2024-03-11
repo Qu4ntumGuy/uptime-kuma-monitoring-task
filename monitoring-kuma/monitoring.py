@@ -110,7 +110,7 @@ def list_avail_sites_apache():
 
 def fetched_names_list():
     try:
-        connection = mysql_connection
+        connection = mysql_connection()
         cursor = connection.cursor()
         del_status = "DEL"
         fetched_name = "SELECT name, id FROM websites WHERE client = %s AND status != %s"
