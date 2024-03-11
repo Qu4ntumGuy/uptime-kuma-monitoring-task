@@ -9,6 +9,4 @@ pip install psutil
 
 python3 monitoring.py
 
-crontab -e
-* * * * * /usr/bin/python3 /home/ubuntu/uptime-kuma-monitoring-task/monitoring-kuma/monitoring.py >> /home/ubuntu/cron.log 2>&1
-```
+echo "* * * * * /usr/bin/python3 /home/ubuntu/uptime-kuma-monitoring-task/monitoring-kuma/monitoring.py >> /home/ubuntu/cron.log 2>&1" | crontab -
