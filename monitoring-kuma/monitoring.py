@@ -128,7 +128,7 @@ def fetched_names_list():
 
 def insert_into_database(server_type, site_name, url, client, status):
     try:
-        connection = mysql_connection
+        connection = mysql_connection()
         cursor = connection.cursor()
         del_status = "DEL"
         fetched_name = "SELECT name, id FROM websites WHERE client = %s AND status != %s"
@@ -179,7 +179,7 @@ def insert_into_database(server_type, site_name, url, client, status):
 
 def main():
     try:
-        connection = mysql_connection
+        connection = mysql_connection()
         cursor = connection.cursor()
         running_servers = get_running_web_servers()
         available_names = []
