@@ -156,15 +156,13 @@ def insert_into_database(server_type, site_name, url, client, status):
                 api.resume_monitor(client_id)
                 print(f"Monitor resumed for {site_name}")
 
-            print(f"Information updated in the database for {
-                  server_type} - {site_name}")
+            print("Information updated in the database")
         else:
             insert_query = "INSERT INTO websites (name, url, client, status) VALUES (%s, %s, %s, %s)"
             values = (site_name, url, client, status)
             cursor.execute(insert_query, values)
             connection.commit()
-            print(f"Information inserted into the database for {
-                  server_type} - {site_name}")
+            print("Information inserted into the database")
             api.add_monitor(
                 type=MonitorType.HTTP,
                 name=site_name,
@@ -230,8 +228,7 @@ def main():
                         except FileNotFoundError:
                             pass
                 else:
-                    print(f"No available sites found for {
-                          server_type.capitalize()}.")
+                    print("No available sites found")
         else:
             print("Neither Apache nor Nginx is running.")
 
