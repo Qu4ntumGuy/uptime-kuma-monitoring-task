@@ -7,4 +7,8 @@ pip install uptime-kuma-api
 pip install python-dotenv
 pip install psutil
 
-python3 updating.py
+python3 monitoring.py
+
+crontab -e
+* * * * * /usr/bin/python3 /home/ubuntu//uptime-kuma-monitoring-task/monitoring-kuma/monitoring.py >> /home/ubuntu/cron.log 2>&1
+```
