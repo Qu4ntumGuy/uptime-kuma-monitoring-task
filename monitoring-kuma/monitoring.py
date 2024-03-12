@@ -72,9 +72,15 @@ def extract_ssl_info_apache(config_content):
     return False
 
 
+# def extract_ssl_info_nginx(config_content):
+#     ssl_match = re.search(r'\blisten\s+443 ssl', config_content)
+#     if ssl_match:
+#         return True
+#     return False
+
 def extract_ssl_info_nginx(config_content):
-    ssl_match = re.search(r'\blisten\s+443 ssl', config_content)
-    if ssl_match:
+    ssl_match = re.search(r'#?\blisten\s+443 ssl', config_content)
+    if ssl_match and not ssl_match.group().startswith('#'):
         return True
     return False
 
